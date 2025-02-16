@@ -7,7 +7,7 @@
 
   <main class="container">
     <div class="hero">
-      <h1 class="hero-title">天免费订阅服务</h1>
+      <h1 class="hero-title">天外天机场</h1>
       <p class="hero-subtitle">每日更新优质免费节点，支持 Clash 和 V2Ray 客户端</p>
     </div>
 
@@ -21,7 +21,7 @@
             readonly
             class="input-field"
           >
-          <button @click="copy(<%= v2rayUrl %>)" class="copy-btn">
+          <button onclick="copy(<%= v2rayUrl %>)" class="copy-btn">
             复制
           </button>
         </div>
@@ -36,7 +36,7 @@
             readonly
             class="input-field"
           >
-          <button @click="copy(<%= v2rayUrl %>)" class="copy-btn">
+          <button onclick="copy(<%= v2rayUrl %>)" class="copy-btn">
             复制
           </button>
         </div>
@@ -47,23 +47,20 @@
       <h3 class="text-xl font-semibold mb-4">使用指南</h3>
       <div class="space-y-4">
         <div class="flex items-start gap-3">
-          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">1</div>
           <div>
-            <h4 class="font-medium">复制订阅链接</h4>
+            <h4 class="font-medium">1. 复制订阅链接</h4>
             <p class="text-gray-600 text-sm">根据你的客户端类型选择上方对应的订阅链接</p>
           </div>
         </div>
         <div class="flex items-start gap-3">
-          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">2</div>
           <div>
-            <h4 class="font-medium">客户端设置</h4>
+            <h4 class="font-medium">2. 客户端设置</h4>
             <p class="text-gray-600 text-sm">在客户端订阅设置中粘贴链接并更新订阅</p>
           </div>
         </div>
         <div class="flex items-start gap-3">
-          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">3</div>
-          <div>
-            <h4 class="font-medium">连接使用</h4>
+         <div>
+            <h4 class="font-medium">3. 连接使用</h4>
             <p class="text-gray-600 text-sm">选择延迟低的节点进行连接即可使用</p>
           </div>
         </div>
