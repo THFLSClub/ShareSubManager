@@ -94,9 +94,9 @@ app.get('/', (req, res) => res.render('index', {
 app.get('/login', (req, res) => res.render('login'));
 app.post('/login', (req, res) => {
   const { username, password } = req.body;
-  const passHash = crypto.createHash('sha256').update(password).digest('hex');
+  const passHash = crypto.createHash('sha256').update(password).digest('hex').toLowerCase();
   console.log(passHash);
-  if (username === config.admin.username && passHash === config.admin.passwordHash) {
+  if (username === config.admin.username && passHash === config.admin.passwordHash.toLowerCase()) {
     req.session.isAdmin = true;
     res.redirect('/admin');
   } else {
