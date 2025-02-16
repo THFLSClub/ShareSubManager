@@ -11,22 +11,23 @@
 
   .container {
     max-width: 1200px;
-    margin: 0 auto;
-    padding: 1rem;
+  margin: 0 auto;
+  padding: 0 1rem; /* 添加左右padding */
   }
 
   /* 导航栏 */
   .navbar {
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 1rem 0;
-  }
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 0; /* 移除原有padding */
+}
 
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0; /* 将padding移到内部容器 */
+}
 
   .logo a {
     font-weight: 700;
@@ -184,16 +185,29 @@
 
   /* 响应式设计 */
   @media (max-width: 768px) {
-    .nav-links {
-      display: none;
-    }
+  .nav-links {
+    display: none;
+    position: absolute;
+    right: 1rem;
+    top: 60px;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    z-index: 100;
+  }
 
-    .hero-title {
-      font-size: 2rem;
-    }
+  .nav-links.active {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-    .node-table {
-      display: block;
-      overflow-x: auto;
-    }
+  .nav-toggle {
+    display: block !important;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+  }
   }
