@@ -416,7 +416,7 @@ app.get('/admin', adminAuth, (req, res) => {
 
 app.post('/add', adminAuth, async (req, res) => {
   const { type, content } = req.body;
-
+  console.log(content);
   try {
     if (type === 'node') {
       const parsed = parseNodeLink(content);
