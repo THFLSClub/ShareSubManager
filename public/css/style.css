@@ -1,0 +1,89 @@
+/* 主内容 */
+.container {
+  padding: 2rem 1rem;
+}
+
+/* 卡片样式 */
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+}
+
+.bg-blue { background: #3b82f6; }
+.bg-purple { background: #8b5cf6; }
+
+/* 输入组 */
+.input-group {
+  position: relative;
+}
+
+.input-field {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.copy-btn {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #64748b;
+}
+
+.copy-btn:hover {
+  color: #3b82f6;
+}
+
+/* 表格 */
+.node-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.node-table th,
+.node-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.node-table th {
+  background: #f8fafc;
+}
+
+.node-type {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
+.node-type.vmess { background: #ede9fe; color: #6d28d9; }
+.node-type.vless { background: #dbeafe; color: #1d4ed8; }
+.node-type.trojan { background: #fee2e2; color: #dc2626; }
+.node-type.ss { background: #ffedd5; color: #ea580c; }
