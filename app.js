@@ -467,7 +467,7 @@ app.get('/sub/:type(clash|v2ray)', (req, res) => {
   });
 });
 
-app.use('/',express.static('public'));
+app.use('/statics',express.static('public'));
 
 // 系统维护
 setInterval(() => {
