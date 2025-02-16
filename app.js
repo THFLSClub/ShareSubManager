@@ -177,147 +177,189 @@ const parseNodeLink = (link) => {
   }
 };
 
-// Clash配置生成器
-const generateClashConfig = (nodes) => {
-  const proxies = nodes.slice(0, config.maxNodes).map(node => {
+// 修复的 V2Ray 订阅生成器（多行链接格式）
+const generateV2rayConfig = (nodes) => {
+  const links = nodes.slice(0, config.maxNodes).map(node => {
     const cfg = JSON.parse(node.config);
     
-    const base = {
-      name: cfg.ps.replace(/[^\x00-\x7F]/g, '').substring(0, 50), // 过滤非ASCII字符
-      server: cfg.add,
-      port: cfg.port,
-      udp: true
-    };
-
     switch(node.type) {
-      case 'ss':
-        return {
-          ...base,
-          type: 'ss',
-          cipher: cfg.method,
-          password: cfg.password
-        };
-
       case 'vmess':
-        return {
-          ...base,
-          type: 'vmess',
-          uuid: cfg.id,
-          alterId: cfg.aid || 0,
-          cipher: cfg.scy || 'auto',
-          tls: cfg.tls === 'tls',
-          network: cfg.net,
-          'ws-path': cfg.path || '/',
-          'ws-headers': { Host: cfg.host || cfg.add }
+        const vmessObject = {
+          v: "2",
+          ps: cfg.ps,
+          add: cfg.add,
+          port: cfg.port,
+          id: cfg.id,
+          aid: cfg.aid || 0,
+          scy: cfg.scy || "auto",
+          net: cfg.net,
+          type: cfg.type || "none",
+          host: cfg.host || cfg.add,
+          path: cfg.path || "",
+          tls: cfg.tls || "none",
+          sni: cfg.sni || ""
         };
-
-      case 'trojan':
-        return {
-          ...base,
-          type: 'trojan',
-          password: cfg.password,
-          sni: cfg.sni,
-          network: cfg.net,
-          'ws-path': cfg.path,
-          'ws-headers': { Host: cfg.host }
-        };
+        const vmessBase64 = Buffer.from(JSON.stringify(vmessObject)).toString('base64');
+        return `vmess://${vmessBase64}#${encodeURIComponent(cfg.ps)}`;
 
       case 'vless':
-        return {
-          ...base,
-          type: 'vless',
-          uuid: cfg.id,
-          flow: cfg.flow,
-          tls: cfg.tls !== 'none',
-          network: cfg.net,
-          servername: cfg.sni || cfg.host,
-          'ws-path': cfg.path,
-          'ws-headers': { Host: cfg.host }
-        };
+        const vlessParams = new URLSearchParams({
+          type: cfg.net,
+          security: cfg.tls,
+          path: cfg.path,
+          host: cfg.host,
+          sni: cfg.sni,
+          flow: cfg.flow
+        }).toString();
+        return `vless://${cfg.id}@${cfg.add}:${cfg.port}?${vlessParams}#${encodeURIComponent(cfg.ps)}`;
+
+      case 'trojan':
+        const trojanParams = new URLSearchParams({
+          type: cfg.net,
+          path: cfg.path,
+          host: cfg.host,
+          sni: cfg.sni
+        }).toString();
+        return `trojan://${cfg.password}@${cfg.add}:${cfg.port}?${trojanParams}#${encodeURIComponent(cfg.ps)}`;
+
+      case 'ss':
+        const ssAuth = `${cfg.method}:${cfg.password}`;
+        return `ss://${Buffer.from(ssAuth).toString('base64')}@${cfg.add}:${cfg.port}#${encodeURIComponent(cfg.ps)}`;
     }
   }).filter(Boolean);
 
-  return YAML.stringify({ proxies });
+  return links.join('\n');
 };
 
-// V2Ray配置生成器
-const generateV2rayConfig = (nodes) => {
-  const outbounds = nodes.slice(0, config.maxNodes).map(node => {
-    const cfg = JSON.parse(node.config);
-    
-    const outbound = {
-      protocol: node.type,
-      settings: {},
-      streamSettings: {},
-      tag: cfg.ps
-    };
-
-    switch(node.type) {
-      case 'vmess':
-        outbound.settings.vnext = [{
-          address: cfg.add,
-          port: cfg.port,
-          users: [{ 
-            id: cfg.id,
-            alterId: cfg.aid || 0,
-            security: cfg.scy || 'auto'
-          }]
-        }];
-        break;
-
-      case 'vless':
-        outbound.settings.vnext = [{
-          address: cfg.add,
-          port: cfg.port,
-          users: [{ 
-            id: cfg.id,
-            flow: cfg.flow,
-            encryption: 'none'
-          }]
-        }];
-        break;
-
-      case 'trojan':
-        outbound.settings.servers = [{
-          address: cfg.add,
-          port: cfg.port,
-          password: cfg.password
-        }];
-        break;
-
-      case 'ss':
-        outbound.settings.servers = [{
-          address: cfg.add,
-          port: cfg.port,
-          method: cfg.method,
-          password: cfg.password
-        }];
-        break;
-    }
-
-    // 通用流设置
-    if (['ws', 'grpc'].includes(cfg.net)) {
-      outbound.streamSettings = {
-        network: cfg.net,
-        security: cfg.tls,
-        wsSettings: {
-          path: cfg.path,
-          headers: { Host: cfg.host }
-        }
+// 修复的 Clash 配置生成器
+const generateClashConfig = (nodes) => {
+  const clashConfig = {
+    'mixed-port': 7890,
+    'allow-lan': false,
+    mode: 'rule',
+    'log-level': 'info',
+    ipv6: false,
+    'external-controller': '0.0.0.0:9090',
+    dns: {
+      enable: true,
+      listen: '0.0.0.0:53',
+      ipv6: false,
+      'default-nameserver': [
+        '223.5.5.5',
+        '114.114.114.114'
+      ],
+      nameserver: [
+        '223.5.5.5',
+        '114.114.114.114',
+        '119.29.29.29',
+        '180.76.76.76'
+      ],
+      'enhanced-mode': 'fake-ip',
+      'fake-ip-range': '198.18.0.1/16',
+      'fake-ip-filter': [
+        '*.lan',
+        '*.localdomain',
+        '*.example',
+        '*.invalid',
+        '*.localhost',
+        '*.test',
+        '*.local',
+        '*.home.arpa',
+        'router.asus.com',
+        'localhost.sec.qq.com',
+        'localhost.ptlogin2.qq.com',
+        '+.msftconnecttest.com'
+      ]
+    },
+    tun: {
+      enable: true,
+      stack: 'system',
+      'auto-route': true,
+      'auto-detect-interface': true,
+      'dns-hijack': [
+        '114.114.114.114',
+        '180.76.76.76',
+        '119.29.29.29',
+        '223.5.5.5',
+        '8.8.8.8',
+        '8.8.4.4',
+        '1.1.1.1',
+        '1.0.0.1'
+      ]
+    },
+    proxies: nodes.slice(0, config.maxNodes).map(node => {
+      const cfg = JSON.parse(node.config);
+      
+      const base = {
+        name: cfg.ps.replace(/[^\x00-\x7F]/g, '').substring(0, 50),
+        server: cfg.add,
+        port: cfg.port,
+        udp: true
       };
 
-      if (cfg.tls === 'tls') {
-        outbound.streamSettings.tlsSettings = {
-          serverName: cfg.sni,
-          alpn: cfg.alpn ? cfg.alpn.split(',') : ['h2', 'http/1.1']
-        };
+      switch(node.type) {
+        case 'ss':
+          return {
+            ...base,
+            type: 'ss',
+            cipher: cfg.method,
+            password: cfg.password
+          };
+
+        case 'vmess':
+          return {
+            ...base,
+            type: 'vmess',
+            uuid: cfg.id,
+            alterId: cfg.aid || 0,
+            cipher: cfg.scy || 'auto',
+            tls: cfg.tls === 'tls',
+            network: cfg.net,
+            'ws-path': cfg.path || '/',
+            'ws-headers': { Host: cfg.host || cfg.add },
+            sni: cfg.sni || cfg.host
+          };
+
+        case 'trojan':
+          return {
+            ...base,
+            type: 'trojan',
+            password: cfg.password,
+            sni: cfg.sni || cfg.host,
+            network: cfg.net,
+            'ws-path': cfg.path,
+            'ws-headers': { Host: cfg.host }
+          };
+
+        case 'vless':
+          return {
+            ...base,
+            type: 'vless',
+            uuid: cfg.id,
+            flow: cfg.flow,
+            tls: cfg.tls !== 'none',
+            network: cfg.net,
+            servername: cfg.sni || cfg.host,
+            'ws-path': cfg.path,
+            'ws-headers': { Host: cfg.host }
+          };
       }
-    }
+    }).filter(Boolean)
+  };
 
-    return outbound;
-  });
+  // 添加规则组
+  clashConfig['proxy-groups'] = [{
+    name: 'PROXY',
+    type: 'select',
+    proxies: clashConfig.proxies.map(p => p.name)
+  }];
 
-  return JSON.stringify({ outbounds }, null, 2);
+  clashConfig.rules = [
+    'GEOIP,CN,DIRECT',
+    'MATCH,PROXY'
+  ];
+
+  return YAML.stringify(clashConfig);
 };
 
 // 路由控制器
@@ -400,6 +442,7 @@ app.post('/add', adminAuth, async (req, res) => {
   }
 });
 
+// 修改后的订阅路由
 app.get('/sub/:type(clash|v2ray)', (req, res) => {
   db.all('SELECT * FROM nodes ORDER BY created_at DESC LIMIT ?', 
     [config.maxNodes], (err, nodes) => {
@@ -407,13 +450,12 @@ app.get('/sub/:type(clash|v2ray)', (req, res) => {
         res.set('Content-Type', 'text/yaml')
            .send(generateClashConfig(nodes));
       } else {
-        res.set('Content-Type', 'application/json')
+        res.set('Content-Type', 'text/plain; charset=utf-8')
            .send(generateV2rayConfig(nodes));
       }
   });
 });
 
-// 系统维护
 setInterval(() => {
   db.run(`DELETE FROM nodes WHERE rowid NOT IN 
     (SELECT rowid FROM nodes ORDER BY created_at DESC LIMIT ?)`, 
