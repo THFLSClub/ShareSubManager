@@ -28,28 +28,37 @@
           </button>
         </div>
 
-        <div x-show="activeTab === 'node'">
-          <textarea
-            name="content"
-            rows="4"
-            class="input-field w-full"
-            placeholder="请输入节点链接（ss://、vmess:// 等格式）"
-          ></textarea>
-          <input type="hidden" name="type" value="node">
-        </div>
+ <!-- 节点输入区域 -->
+  <div x-show="activeTab === 'node'">
+    <textarea
+      name="content"
+      rows="4"
+      class="input-field w-full"
+      placeholder="请输入节点链接（ss://、vmess:// 等格式）"
+    ></textarea>
+  </div>
 
-        <div x-show="activeTab === 'sub'">
-          <input
-            type="url"
-            name="content"
-            class="input-field w-full"
-            placeholder="请输入订阅链接地址"
-          >
-          <input type="hidden" name="type" value="subscription">
-        </div>
+  <!-- 订阅链接输入区域 -->
+  <div x-show="activeTab === 'sub'">
+    <input
+      type="url"
+      name="content"
+      class="input-field w-full"
+      placeholder="请输入订阅链接地址"
+    >
+  </div>
 
-        <button type="submit" class="btn btn-primary">添加节点</button>
-      </form>
+  <!-- 动态type字段 -->
+  <input 
+    type="hidden" 
+    name="type" 
+    :value="activeTab === 'node' ? 'node' : 'subscription'"
+  >
+
+  <button type="submit" class="btn btn-primary">添加节点</button>
+
+
+        </form>
 
     </div>
 
