@@ -46,6 +46,7 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.use('/public',express.static('public'));
 
 // 数据库初始化
 const db = new sqlite3.Database(config.database);
