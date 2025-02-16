@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TW Public Sub</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>TW Public Sub</h1>
+    <% if (isAdmin) { %>
+        <a href="/admin">Admin Panel</a>
+    <% } else { %>
+        <a href="/login">Admin Login</a>
+    <% } %>
+    <p>Total subscriptions: <%= subsCount %></p>
+    <p>Total nodes: <%= nodesCount %></p>
+    <h2>Subscribe:</h2>
+    <a href="/subscribe/clash">Clash Config</a><br>
+    <a href="/subscribe/v2ray">V2Ray Config</a>
+</body>
+</html>
