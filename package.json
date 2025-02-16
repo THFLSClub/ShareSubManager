@@ -11,11 +11,14 @@
   "dependencies": {
     "axios": "^1.7.9",
     "bcryptjs": "^3.0.0",
+    "dotenv": "^16.4.7",
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "lowdb": "^1.0.0",
+    "sqlite3": "^5.1.7",
     "url-search-params-polyfill": "^8.2.5",
+    "uuid": "^11.0.5",
     "yaml": "^2.7.0"
   }
 }
