@@ -1,9 +1,23 @@
-<!DOCTYPE html>
-<html>
-<body>
-  <h1>TW Public Sub</h1>
-  <p>Clash 订阅：<code><%= clashUrl %></code></p>
-  <p>V2Ray 订阅：<code><%= v2rayUrl %></code></p>
-  <a href="/admin">管理员入口</a>
-</body>
-</html>
+<%- include('layout', { title: '首页', isAdmin: false }) %>
+
+<div class="grid">
+  <div class="card">
+    <h3>Clash 订阅</h3>
+    <div class="copy-box">
+      <input type="text" value="<%= clashUrl %>" readonly style="flex:1">
+      <button onclick="copyToClipboard('<%= clashUrl %>')" class="secondary">
+        复制
+      </button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>V2Ray 订阅</h3>
+    <div class="copy-box">
+      <input type="text" value="<%= v2rayUrl %>" readonly style="flex:1">
+      <button onclick="copyToClipboard('<%= v2rayUrl %>')" class="secondary">
+        复制
+      </button>
+    </div>
+  </div>
+</div>
