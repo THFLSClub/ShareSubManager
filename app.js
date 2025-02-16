@@ -69,8 +69,8 @@ const nodeParsers = {
   ss: (url) => {
     try {
       const [hashPart, serverPart] = url.split('@');
-      const decoded = Buffer.from(hashPart, 'base64').toString();
-      const [method, password] = decoded.split(':');
+      const decodedHash = decodeBase64Recursively(hashPart);
+      const [method, password] = decodedHash.split(':');
       const [hostPort, fragment] = serverPart.split('#');
       const [host, port] = hostPort.includes(':') ? 
         hostPort.split(':') : [hostPort, '8388'];
@@ -94,6 +94,7 @@ const nodeParsers = {
     try {
       const parsed = new URL.URL(`vless://${url}`);
       const query = Object.fromEntries(parsed.searchParams);
+      const id = decodeBase64Recursively(parsed.username);
       
       return {
         protocol: 'vless',
@@ -101,7 +102,7 @@ const nodeParsers = {
           ps: parsed.hash ? decodeURIComponent(parsed.hash.slice(1)) : 'VLESS Node',
           add: parsed.hostname,
           port: parseInt(parsed.port),
-          id: parsed.username,
+          id: id,
           net: query.type || 'tcp',
           path: query.path ? decodeURIComponent(query.path) : '',
           host: query.host || parsed.hostname,
@@ -120,6 +121,7 @@ const nodeParsers = {
     try {
       const parsed = new URL.URL(`trojan://${url}`);
       const query = Object.fromEntries(parsed.searchParams);
+      const password = decodeBase64Recursively(parsed.username);
 
       return {
         protocol: 'trojan',
@@ -127,7 +129,7 @@ const nodeParsers = {
           ps: parsed.hash ? decodeURIComponent(parsed.hash.slice(1)) : 'Trojan Node',
           add: parsed.hostname,
           port: parseInt(parsed.port),
-          password: parsed.username,
+          password: password,
           net: query.type || 'tcp',
           path: query.path ? decodeURIComponent(query.path) : '',
           host: query.host || parsed.hostname,
@@ -143,7 +145,7 @@ const nodeParsers = {
   vmess: (url) => {
     try {
       const [base64, fragment] = url.split('#');
-      const configStr = Buffer.from(base64, 'base64').toString();
+      const configStr = decodeBase64Recursively(base64);
       return {
         protocol: 'vmess',
         config: {
@@ -156,6 +158,21 @@ const nodeParsers = {
     }
   }
 };
+
+// 添加递归解码函数
+function decodeBase64Recursively(str) {
+  let decoded = str;
+  let prev;
+  do {
+    prev = decoded;
+    try {
+      decoded = Buffer.from(decoded, 'base64').toString('utf-8');
+    } catch (e) {
+      break;
+    }
+  } while (decoded !== prev);
+  return decoded;
+}
 
 // 统一解析入口
 const parseNodeLink = (link) => {
@@ -416,41 +433,53 @@ app.get('/admin', adminAuth, (req, res) => {
 
 app.post('/add', adminAuth, async (req, res) => {
   const { type, content } = req.body;
-  console.log(content);
   try {
     if (type === 'node') {
-      const parsed = parseNodeLink(content);
-      if (!parsed) throw new Error('不支持的节点格式');
-
-      db.run(
-        `INSERT OR IGNORE INTO nodes (id, type, config) 
-         VALUES (?, ?, ?)`,
-        [uuidv4(), parsed.protocol, JSON.stringify(parsed.config)]
-      );
+      const lines = content.split('\n');
+      let hasValid = false;
+      lines.forEach(line => {
+        const trimmedLine = line.trim();
+        if (!trimmedLine) return;
+        const parsed = parseNodeLink(trimmedLine);
+        if (!parsed) {
+          console.error('无法解析链接:', trimmedLine);
+          return;
+        }
+        hasValid = true;
+        db.run(
+          `INSERT OR IGNORE INTO nodes (id, type, config) 
+           VALUES (?, ?, ?)`,
+          [uuidv4(), parsed.protocol, JSON.stringify(parsed.config)],
+          (err) => { if (err) console.error('插入失败:', err) }
+        );
+      });
+      if (!hasValid) throw new Error('未找到有效节点');
     } else if (type === 'subscription') {
-      const { data } = await axios.get(content, { timeout: 5000 });
-      const links = data.split('\n').filter(l => l.startsWith('ss://') || 
+      const response = await axios.get(content, { timeout: 5000 });
+      let data = response.data;
+      data = decodeBase64Recursively(data);
+      const links = data.split('\n').filter(l => 
+        l.startsWith('ss://') || 
         l.startsWith('vmess://') || 
         l.startsWith('vless://') || 
-        l.startsWith('trojan://'));
+        l.startsWith('trojan://')
+      );
       
       links.forEach(link => {
-        const parsed = parseNodeLink(link);
+        const parsed = parseNodeLink(link.trim());
         if (parsed) {
           db.run(
             `INSERT OR IGNORE INTO nodes (id, type, config) 
              VALUES (?, ?, ?)`,
-            [uuidv4(), parsed.protocol, JSON.stringify(parsed.config)]
+            [uuidv4(), parsed.protocol, JSON.stringify(parsed.config)],
+            (err) => { if (err) console.error('插入失败:', err) }
           );
         }
       });
     }
-    
     res.redirect('/admin');
   } catch (e) {
-    res.status(400).render('error', { 
-      message: `添加失败: ${e.message}` 
-    });
+    res.status(400).render('error', { message: `操作失败: ${e.message}` });
   }
 });
 
