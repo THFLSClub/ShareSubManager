@@ -1,33 +1,21 @@
-<nav class="bg-white shadow-sm" x-data="{ isOpen: false }">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16">
-      <div class="flex-shrink-0 flex items-center">
-        <h1 class="text-2xl font-bold text-slate-800 tracking-tighter">
-          <a href="/" class="hover:text-blue-600 transition-colors">SubsManager</a>
-        </h1>
-      </div>
+<!-- views/partials/nav.ejs -->
+<nav class="navbar" x-data="{ isOpen: false }">
+  <div class="container">
+    <div class="flex items-center justify-between">
+      <h1 class="logo">
+        <a href="/">SubsManager</a>
+      </h1>
       
-      <div class="hidden sm:ml-6 sm:flex sm:items-center space-x-4">
+      <button class="nav-toggle sm:hidden" @click="isOpen = !isOpen">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <div class="nav-links" :class="isOpen ? 'active' : ''">
         <% if (locals.isAdmin) { %>
-          <a 
-            href="/admin"
-            class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-          >
-            节点管理
-          </a>
-          <a 
-            href="/logout"
-            class="px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50"
-          >
-            登出
-          </a>
+          <a href="/admin" class="nav-link">节点管理</a>
+          <a href="/logout" class="nav-link text-red">登出</a>
         <% } else { %>
-          <a 
-            href="/login"
-            class="px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-900"
-          >
-            管理员登录
-          </a>
+          <a href="/login" class="nav-link">管理员登录</a>
         <% } %>
       </div>
     </div>
