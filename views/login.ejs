@@ -6,8 +6,8 @@
 </head>
 <body>
     <h1>Admin Login</h1>
-    <% if (error) { %>
-        <p class="error"><%= error %></p>
+    <% if (locals.error) { %>
+       <p class="error"><%= error %></p>
     <% } %>
     <form method="post">
         <input type="text" name="username" placeholder="Username" required>
