@@ -323,82 +323,56 @@ const generateClashConfig = (nodes) => {
 
 // V2Ray配置生成器
 const generateV2rayConfig = (nodes) => {
-  const outbounds = nodes.slice(0, config.maxNodes).map(node => {
+  const links = nodes.slice(0, config.maxNodes).map(node => {
     const cfg = JSON.parse(node.config);
     
-    const outbound = {
-      protocol: node.type,
-      settings: {},
-      streamSettings: {},
-      tag: cfg.ps
-    };
-
     switch(node.type) {
       case 'vmess':
-        outbound.settings.vnext = [{
-          address: cfg.add,
+        const vmessObject = {
+          v: "2",
+          ps: cfg.ps,
+          add: cfg.add,
           port: cfg.port,
-          users: [{ 
-            id: cfg.id,
-            alterId: cfg.aid || 0,
-            security: cfg.scy || 'auto'
-          }]
-        }];
-        break;
+          id: cfg.id,
+          aid: cfg.aid || 0,
+          scy: cfg.scy || "auto",
+          net: cfg.net,
+          type: cfg.type || "none",
+          host: cfg.host || cfg.add,
+          path: cfg.path || "",
+          tls: cfg.tls || "none",
+          sni: cfg.sni || ""
+        };
+        const vmessBase64 = Buffer.from(JSON.stringify(vmessObject)).toString('base64');
+        return `vmess://${vmessBase64}#${encodeURIComponent(cfg.ps)}`;
 
       case 'vless':
-        outbound.settings.vnext = [{
-          address: cfg.add,
-          port: cfg.port,
-          users: [{ 
-            id: cfg.id,
-            flow: cfg.flow,
-            encryption: 'none'
-          }]
-        }];
-        break;
+        const vlessParams = new URLSearchParams({
+          type: cfg.net,
+          security: cfg.tls,
+          path: cfg.path,
+          host: cfg.host,
+          sni: cfg.sni,
+          flow: cfg.flow
+        }).toString();
+        return `vless://${cfg.id}@${cfg.add}:${cfg.port}?${vlessParams}#${encodeURIComponent(cfg.ps)}`;
 
       case 'trojan':
-        outbound.settings.servers = [{
-          address: cfg.add,
-          port: cfg.port,
-          password: cfg.password
-        }];
-        break;
+        const trojanParams = new URLSearchParams({
+          type: cfg.net,
+          path: cfg.path,
+          host: cfg.host,
+          sni: cfg.sni
+        }).toString();
+        return `trojan://${cfg.password}@${cfg.add}:${cfg.port}?${trojanParams}#${encodeURIComponent(cfg.ps)}`;
 
       case 'ss':
-        outbound.settings.servers = [{
-          address: cfg.add,
-          port: cfg.port,
-          method: cfg.method,
-          password: cfg.password
-        }];
-        break;
+        const ssAuth = `${cfg.method}:${cfg.password}`;
+        return `ss://${Buffer.from(ssAuth).toString('base64')}@${cfg.add}:${cfg.port}#${encodeURIComponent(cfg.ps)}`;
     }
+  }).filter(Boolean);
 
-    // 通用流设置
-    if (['ws', 'grpc'].includes(cfg.net)) {
-      outbound.streamSettings = {
-        network: cfg.net,
-        security: cfg.tls,
-        wsSettings: {
-          path: cfg.path,
-          headers: { Host: cfg.host }
-        }
-      };
-
-      if (cfg.tls === 'tls') {
-        outbound.streamSettings.tlsSettings = {
-          serverName: cfg.sni,
-          alpn: cfg.alpn ? cfg.alpn.split(',') : ['h2', 'http/1.1']
-        };
-      }
-    }
-
-    return outbound;
-  });
-
-  return JSON.stringify({ outbounds }, null, 2);
+  return links.join('\n');
 };
 
 // 路由控制器
