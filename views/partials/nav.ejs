@@ -1,19 +1,14 @@
 <!-- views/partials/nav.ejs -->
-<nav class="navbar" x-data="{ isOpen: false }">
+<nav class="navbar">
   <div class="container">
-    <div class="flex items-center justify-between">
+    <div class="nav-inner">
       <h1 class="logo">
-        <a href="/">SubsManager</a>
+        <a href="/">SubManager</a>
       </h1>
-      
-      <button class="nav-toggle sm:hidden" @click="isOpen = !isOpen">
-        <i class="fas fa-bars"></i>
-      </button>
-
-      <div class="nav-links" :class="isOpen ? 'active' : ''">
+      <div class="nav-links">
         <% if (locals.isAdmin) { %>
           <a href="/admin" class="nav-link">节点管理</a>
-          <a href="/logout" class="nav-link text-red">登出</a>
+          <a href="/logout" class="nav-link">登出</a>
         <% } else { %>
           <a href="/login" class="nav-link">管理员登录</a>
         <% } %>
