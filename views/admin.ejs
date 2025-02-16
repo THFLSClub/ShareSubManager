@@ -1,110 +1,88 @@
+<!-- views/admin.ejs -->
 <!DOCTYPE html>
 <html lang="zh-CN" x-data="{ activeTab: 'node' }">
 <%- include('partials/head') %>
-<body class="bg-slate-50" x-cloak>
+<body x-cloak>
   <%- include('partials/nav') %>
 
-  <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between mb-8">
-      <h2 class="text-2xl font-bold text-gray-900">节点管理</h2>
-      <div class="text-gray-500 text-sm">
-        节点总数: <%= nodes.length %>
-      </div>
+  <main class="container">
+    <div class="admin-header">
+      <h2>节点管理</h2>
+      <div class="node-count">节点总数: <%= nodes.length %></div>
     </div>
 
-    <!-- 添加节点部分 -->
-    <div class="mb-8 bg-white rounded-xl shadow-sm p-6">
-      <h3 class="text-lg font-semibold mb-4">添加新节点</h3>
-      <form method="post" action="/add" class="space-y-4">
-        <div class="flex gap-4">
+    <div class="card">
+      <h3>添加新节点</h3>
+      <form method="post" action="/add" class="form">
+        <div class="tab-control">
           <button 
             type="button"
             @click="activeTab = 'node'"
-            :class="activeTab === 'node' 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-white text-gray-700 border border-gray-300'"
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            单个节点
-          </button>
+            :class="activeTab === 'node' ? 'active' : ''"
+          >单个节点</button>
           <button 
             type="button"
             @click="activeTab = 'sub'"
-            :class="activeTab === 'sub' 
-              ? 'bg-blue-600 text-white' 
-              : 'bg-white text-gray-700 border border-gray-300'"
-            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-          >
-            订阅链接
-          </button>
+            :class="activeTab === 'sub' ? 'active' : ''"
+          >订阅链接</button>
         </div>
 
         <div x-show="activeTab === 'node'">
-          <label class="block text-sm font-medium text-gray-700 mb-1">节点链接</label>
+          <label>节点链接</label>
           <textarea
             name="content"
             rows="4"
+            class="input-field"
             placeholder="ss://、vmess:// 等格式..."
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
           ></textarea>
           <input type="hidden" name="type" value="node">
         </div>
 
         <div x-show="activeTab === 'sub'">
-          <label class="block text-sm font-medium text-gray-700 mb-1">订阅链接</label>
+          <label>订阅链接</label>
           <input
             type="url"
             name="content"
+            class="input-field"
             placeholder="https://example.com/sub"
-            class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
           <input type="hidden" name="type" value="subscription">
         </div>
 
-        <button
-          type="submit"
-          class="w-full sm:w-auto px-6 py-2 border border-transparent rounded-lg bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500"
-        >
-          添加节点
-        </button>
+        <button type="submit" class="btn btn-primary">添加节点</button>
       </form>
     </div>
 
-    <!-- 节点列表 -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+    <div class="table-container">
+      <table class="node-table">
+        <thead>
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">类型</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">节点配置</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">创建时间</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">操作</th>
+            <th>类型</th>
+            <th>节点配置</th>
+            <th>创建时间</th>
+            <th>操作</th>
           </tr>
         </thead>
-        <tbody class="divide-y divide-gray-200">
+        <tbody>
           <% nodes.forEach(node => { 
             const cfg = JSON.parse(node.config) %>
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs font-medium rounded-full 
-                  <%= {
-                    vmess: 'bg-purple-100 text-purple-800',
-                    vless: 'bg-blue-100 text-blue-800',
-                    trojan: 'bg-red-100 text-red-800',
-                    ss: 'bg-orange-100 text-orange-800'
-                  }[node.type] %>">
+              <td>
+                <span class="node-type <%= node.type %>">
                   <%= node.type.toUpperCase() %>
                 </span>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-900 max-w-xs">
-                <div class="font-medium"><%= cfg.ps %></div>
-                <div class="text-gray-500 text-sm font-mono"><%= cfg.add %>:<%= cfg.port %></div>
+              <td>
+                <div class="node-info">
+                  <div class="node-name"><%= cfg.ps %></div>
+                  <div class="node-address"><%= cfg.add %>:<%= cfg.port %></div>
+                </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td>
                 <%= new Date(node.created_at).toLocaleDateString() %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <button class="text-red-600 hover:text-red-900">
+              <td>
+                <button class="delete-btn">
                   <i class="fas fa-trash"></i>
                 </button>
               </td>
