@@ -29,24 +29,24 @@
         </div>
 
  <!-- 节点输入区域 -->
-  <div x-show="activeTab === 'node'">
+<div x-show="activeTab === 'node'">
     <textarea
-      name="content"
-      rows="4"
-      class="input-field w-full"
-      placeholder="请输入节点链接（ss://、vmess:// 等格式）"
+        :name="activeTab === 'node'? 'content' : ''"
+        rows="4"
+        class="input-field w-full"
+        placeholder="请输入节点链接（ss://、vmess:// 等格式）"
     ></textarea>
-  </div>
+</div>
 
-  <!-- 订阅链接输入区域 -->
-  <div x-show="activeTab === 'sub'">
+<!-- 订阅链接输入区域 -->
+<div x-show="activeTab === 'sub'">
     <input
-      type="url"
-      name="content"
-      class="input-field w-full"
-      placeholder="请输入订阅链接地址"
+        :name="activeTab === 'sub'? 'content' : ''"
+        type="url"
+        class="input-field w-full"
+        placeholder="请输入订阅链接地址"
     >
-  </div>
+</div>
 
   <!-- 动态type字段 -->
   <input 
