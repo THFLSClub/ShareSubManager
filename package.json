@@ -1,0 +1,20 @@
+{
+  "name": "sharesubmanager",
+  "version": "1.0.0",
+  "description": "轻量高效，用于分享和获取免费订阅。专为天外计算机社设计。",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "bcryptjs": "^3.0.0",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "lowdb": "^7.0.1",
+    "yaml": "^2.7.0"
+  }
+}
