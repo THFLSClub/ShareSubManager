@@ -106,20 +106,33 @@ app.post('/add-subscription', requireLogin, async (req, res) => {
 })
 
 app.post('/add-node', requireLogin, (req, res) => {
-  const { link } = req.body
-  const node = parseV2rayLink(link)
-  
+  const { link } = req.body;
+  let node;
+
+  if (link.startsWith('vmess://')) {
+    node = parseV2rayLink(link);
+  } else if (link.startsWith('ss://')) {
+    node = parseSSLink(link);
+  } else {
+    return res.status(400).send('Unsupported link type');
+  }
+
   if (node) {
+    // 验证必要字段
+    if (!node.server || !node.port || !node.method || !node.password) {
+      return res.status(400).send('Invalid SS node configuration');
+    }
+    
     db.get('nodes').push({
       ...node,
       id: crypto.randomUUID(),
       createdAt: new Date()
-    }).write()
-    res.redirect('/admin')
+    }).write();
+    res.redirect('/admin');
   } else {
-    res.status(400).send('Invalid node link')
+    res.status(400).send('Invalid node link');
   }
-})
+});
 
 app.get('/subscribe/:type', async (req, res) => {
   try {
@@ -177,26 +190,90 @@ function parseV2rayLink(link) {
   return JSON.parse(decoded)
 }
 
+function parseSSLink(link) {
+  if (!link.startsWith('ss://')) return null;
+
+  try {
+    // 处理Base64编码部分
+    const encoded = link.slice(5).split('#')[0].split('/')[0];
+    const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+    
+    // 分割方法、密码和服务器信息
+    const [auth, server] = decoded.split('@');
+    const [method, password] = auth.split(':');
+    const [host, port] = server.split(':');
+
+    return {
+      type: 'ss',
+      name: decodeURIComponent(link.split('#')[1] || 'Unnamed SS Node'),
+      server: host,
+      port: parseInt(port),
+      method: method,
+      password: password,
+      plugin: link.includes('plugin=') ? parseSSPlugin(link) : undefined
+    };
+  } catch (error) {
+    // 尝试解析明文格式（非Base64）
+    const match = link.match(/ss:\/\/(.*?):(.*?)@(.*?):(\d+)/);
+    if (match) {
+      return {
+        type: 'ss',
+        name: 'SS Node',
+        server: match[3],
+        port: parseInt(match[4]),
+        method: match[1],
+        password: match[2]
+      };
+    }
+    return null;
+  }
+}
+
+// 解析插件参数（如simple-obfs）
+function parseSSPlugin(link) {
+  const params = new URLSearchParams(link.split('?')[1]);
+  return {
+    name: params.get('plugin')?.split(';')[0],
+    options: Object.fromEntries(
+      params.get('plugin')?.split(';')[1]?.split(',')?.map(p => p.split('=')) || {}
+  };
+}
+
 function generateClashConfig(nodes) {
+  const clashNodes = nodes.map(node => {
+    if (node.type === 'ss') {
+      return {
+        name: node.name,
+        type: 'ss',
+        server: node.server,
+        port: node.port,
+        cipher: node.method,
+        password: node.password,
+        plugin: node.plugin?.name,
+        'plugin-opts': node.plugin?.options
+      };
+    }
+    return node;
+  });
+
   return YAML.stringify({
-    proxies: nodes,
+    proxies: clashNodes,
     'proxy-groups': [{
       name: 'TW Public Sub',
       type: 'select',
-      proxies: nodes.map(n => n.name)
+      proxies: clashNodes.map(n => n.name)
     }]
-  })
+  });
 }
 
 function generateV2rayConfig(nodes) {
-  return JSON.stringify(nodes.map(n => ({
-    ...n,
-    ps: n.name || 'TW Node',
-    add: n.address,
-    port: n.port,
-    id: n.uuid,
-    aid: n.alterId || 0
-  })))
+  return JSON.stringify(nodes.map(node => {
+    if (node.type === 'ss') {
+      return `ss://${Buffer.from(`${node.method}:${node.password}@${node.server}:${node.port}`)
+        .toString('base64')}#${encodeURIComponent(node.name)}`;
+    }
+    return node;
+  }));
 }
 
 // 视图模板
