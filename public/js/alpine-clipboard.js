@@ -24,6 +24,3 @@ async function copy(string) {
         document.body.removeChild(textarea);
     }
 }
-
-// 示例使用
-copy('这是要复制的文本');
