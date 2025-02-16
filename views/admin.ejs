@@ -1,21 +1,38 @@
-<!DOCTYPE html>
-<html>
-<body>
-  <h1>节点管理</h1>
-  <form action="/add" method="post">
-    <select name="type">
-      <option value="node">添加单个节点</option>
-      <option value="subscription">添加订阅链接</option>
-    </select>
-    <input type="text" name="content" required>
-    <button type="submit">提交</button>
+<%- include('layout', { title: '节点管理', isAdmin: true }) %>
+
+<article>
+  <hgroup>
+    <h2>节点管理</h2>
+    <h3>当前节点数: <%= nodes.length %></h3>
+  </hgroup>
+
+  <form method="post" action="/add">
+    <div class="grid">
+      <select name="type" required>
+        <option value="node">单个节点</option>
+        <option value="subscription">订阅链接</option>
+      </select>
+      <input type="text" name="content" placeholder="节点链接或订阅地址" required>
+    </div>
+    <button type="submit">添加节点</button>
   </form>
-  
-  <h2>现有节点 (<%= nodes.length %>)</h2>
-  <ul>
-    <% nodes.forEach(node => { %>
-      <li><%= JSON.parse(node.config).ps %></li>
-    <% }) %>
-  </ul>
-</body>
-</html>
+
+  <table role="grid" style="margin-top: 2rem">
+    <thead>
+      <tr>
+        <th>类型</th>
+        <th>配置详情</th>
+        <th>添加时间</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% nodes.forEach(node => { %>
+        <tr>
+          <td><%= node.type.toUpperCase() %></td>
+          <td><pre><%= JSON.stringify(JSON.parse(node.config), null, 2) %></pre></td>
+          <td><%= new Date(node.created_at).toLocaleString() %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</article>
