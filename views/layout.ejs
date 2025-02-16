@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>节点订阅服务 - <%= title %></title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+  <style>
+    :root {
+      --primary: #6366f1;
+      --hover: #4f46e5;
+    }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      margin-bottom: 2rem;
+    }
+    .copy-box {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <% if (isAdmin) { %>
+      <nav>
+        <ul>
+          <li><strong>管理面板</strong></li>
+        </ul>
+        <ul>
+          <li><a href="/" role="button">返回首页</a></li>
+          <li><a href="/logout" role="button" class="secondary">注销</a></li>
+        </ul>
+      </nav>
+    <% } %>
+    <%- body %>
+  </main>
+  
+  <script>
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('链接已复制到剪贴板');
+      });
+    }
+  </script>
+</body>
+</html>
