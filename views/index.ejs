@@ -1,83 +1,60 @@
+<!-- views/index.ejs -->
 <!DOCTYPE html>
-<html lang="zh-CN" x-data>
+<html lang="zh-CN" x-cloak>
 <%- include('partials/head') %>
-<body class="bg-slate-50" x-cloak>
+<body>
   <%- include('partials/nav') %>
 
-  <main class="max-w-5xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-    <div class="text-center mb-16">
-      <h2 class="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-        订阅链接管理平台
-      </h2>
-      <p class="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-        快速生成 Clash 和 V2Ray 客户端订阅链接，支持多协议混合订阅
-      </p>
+  <main class="container">
+    <div class="hero text-center">
+      <h1 class="hero-title">订阅链接管理平台</h1>
+      <p class="hero-subtitle">快速生成 Clash 和 V2Ray 客户端订阅链接，支持多协议混合订阅</p>
     </div>
 
-    <div class="grid md:grid-cols-2 gap-8">
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center mb-4">
-          <div class="flex-shrink-0 bg-blue-500 p-3 rounded-lg">
-            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-            </svg>
-          </div>
-          <h3 class="ml-3 font-semibold text-lg text-gray-900">Clash 订阅链接</h3>
+    <div class="grid-cols-2">
+      <div class="card">
+        <div class="card-header">
+          <i class="card-icon bg-blue"></i>
+          <h3 class="card-title">Clash 订阅链接</h3>
         </div>
-        <div x-clipboard class="relative">
+        <div x-clipboard class="input-group">
           <input 
             type="text" 
             value="<%= clashUrl %>" 
             readonly
-            class="w-full pr-12 bg-gray-50 border border-gray-300 rounded-md py-2 px-4 text-sm font-mono"
+            class="input-field"
           >
-          <button 
-            @click="copy($clipboard)"
-            class="absolute right-2 top-2 p-2 text-gray-500 hover:text-blue-600"
-            title="复制链接"
-          >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
+          <button @click="copy($clipboard)" class="copy-btn">
+            <i class="fas fa-copy"></i>
           </button>
         </div>
       </div>
 
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center mb-4">
-          <div class="flex-shrink-0 bg-purple-500 p-3 rounded-lg">
-            <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-          </div>
-          <h3 class="ml-3 font-semibold text-lg text-gray-900">V2Ray 订阅链接</h3>
+      <div class="card">
+        <div class="card-header">
+          <i class="card-icon bg-purple"></i>
+          <h3 class="card-title">V2Ray 订阅链接</h3>
         </div>
-        <div x-clipboard class="relative">
+        <div x-clipboard class="input-group">
           <input 
             type="text" 
             value="<%= v2rayUrl %>" 
             readonly
-            class="w-full pr-12 bg-gray-50 border border-gray-300 rounded-md py-2 px-4 text-sm font-mono"
+            class="input-field"
           >
-          <button 
-            @click="copy($clipboard)"
-            class="absolute right-2 top-2 p-2 text-gray-500 hover:text-blue-600"
-            title="复制链接"
-          >
-            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-            </svg>
+          <button @click="copy($clipboard)" class="copy-btn">
+            <i class="fas fa-copy"></i>
           </button>
         </div>
       </div>
     </div>
 
-    <div class="mt-12 bg-blue-50 rounded-lg p-6 border border-blue-200">
-      <h4 class="text-lg font-semibold text-blue-800 mb-3">使用方法</h4>
-      <ul class="space-y-2 text-blue-700">
-        <li>❶ 复制上方对应客户端的订阅链接</li>
-        <li>❷ 在客户端中粘贴订阅链接并更新订阅</li>
-        <li>❸ 选择节点并连接使用</li>
+    <div class="usage-guide">
+      <h4>使用方法</h4>
+      <ul>
+        <li>❶ 复制对应客户端订阅链接</li>
+        <li>❷ 在客户端中粘贴并更新</li>
+        <li>❸ 选择节点连接使用</li>
       </ul>
     </div>
   </main>
