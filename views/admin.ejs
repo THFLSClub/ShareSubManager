@@ -50,6 +50,17 @@
 
         <button type="submit" class="btn btn-primary">添加节点</button>
       </form>
+<% if (req.query.error) { %>
+<div class="alert-error" style="background: #fee2e2; color: #dc2626; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+  <%= req.session.error %>
+</div>
+<% } %>
+<% if (req.query.success) { %>
+<div class="alert-success" style="background: #dcfce7; color: #16a34a; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+  节点添加成功！
+</div>
+<% } %>
+
     </div>
 
     <div class="card">
