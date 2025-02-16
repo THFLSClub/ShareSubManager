@@ -14,7 +14,8 @@
     "ejs": "^3.1.10",
     "express": "^4.21.2",
     "express-session": "^1.18.1",
-    "lowdb": "^7.0.1",
+    "lowdb": "^1.0.0",
+    "url-search-params-polyfill": "^8.2.5",
     "yaml": "^2.7.0"
   }
 }
