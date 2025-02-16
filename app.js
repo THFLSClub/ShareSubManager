@@ -343,7 +343,7 @@ app.post('/login', (req, res) => {
 
   const passHash = crypto.createHash('sha256').update(password).digest('hex');
   
-  if (username === config.admin.username && passHash === config.admin.passwordHash) {
+  if (username === config.admin.username && passHash.toLowerCase() === config.admin.passwordHash.toLowerCase()) {
     req.session.regenerate(err => {
       req.session.isAdmin = true;
       req.session.save(() => res.redirect('/admin'));
