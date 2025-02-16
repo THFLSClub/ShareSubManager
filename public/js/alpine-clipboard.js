@@ -1,8 +1,29 @@
-/**
- * Minified by jsDelivr using Terser v5.19.2.
- * Original file: /npm/@ryangjchandler/alpine-clipboard@2.3.0/src/index.js
- *
- * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
- */
-let onCopy=()=>{};const copy=(o,e=void 0)=>("function"==typeof o&&(o=o()),"object"==typeof o&&(o=JSON.stringify(o)),void 0!==e?window.navigator.clipboard.write([new ClipboardItem({[e]:new Blob([o],{type:e})})]).then(onCopy):window.navigator.clipboard.writeText(o).then(onCopy));function Clipboard(o){o.magic("clipboard",(()=>copy)),o.directive("clipboard",((o,{modifiers:e,expression:i},{evaluateLater:n,cleanup:t})=>{const p=e.includes("raw")?o=>o(i):n(i),r=()=>p(copy);o.addEventListener("click",r),t((()=>{o.removeEventListener("click",r)}))}))}Clipboard.configure=o=>(o.hasOwnProperty("onCopy")&&"function"==typeof o.onCopy&&(onCopy=o.onCopy),Clipboard);export default Clipboard;
-//# sourceMappingURL=/sm/b0c58639a752e521b1b91d709d419bc94da7bbbb4b45ecef03e067a8ceed6479.map
+async function copy(string) {
+    try {
+        // 使用 navigator.clipboard.writeText 方法将字符串写入剪贴板
+        await navigator.clipboard.writeText(string);
+        console.log('文本已成功复制到剪贴板');
+    } catch (error) {
+        // 如果复制过程中出现错误，使用旧的 document.execCommand 方法作为备用方案
+        const textarea = document.createElement('textarea');
+        textarea.value = string;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            const successful = document.execCommand('copy');
+            if (successful) {
+                console.log('文本已成功复制到剪贴板');
+            } else {
+                console.error('复制到剪贴板失败');
+            }
+        } catch (err) {
+            console.error('复制到剪贴板时发生错误:', err);
+        }
+        document.body.removeChild(textarea);
+    }
+}
+
+// 示例使用
+copy('这是要复制的文本');
