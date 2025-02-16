@@ -6,18 +6,15 @@
   <%- include('partials/nav') %>
 
   <main class="container">
-    <div class="hero text-center">
-      <h1 class="hero-title">订阅链接管理平台</h1>
-      <p class="hero-subtitle">快速生成 Clash 和 V2Ray 客户端订阅链接，支持多协议混合订阅</p>
+    <div class="hero">
+      <h1 class="hero-title">社团节点订阅服务</h1>
+      <p class="hero-subtitle">每日更新优质免费节点，支持 Clash 和 V2Ray 客户端</p>
     </div>
 
     <div class="grid-cols-2">
       <div class="card">
-        <div class="card-header">
-          <i class="card-icon bg-blue"></i>
-          <h3 class="card-title">Clash 订阅链接</h3>
-        </div>
-        <div x-clipboard class="input-group">
+        <h3 class="text-lg font-semibold mb-4">Clash 订阅地址</h3>
+        <div class="input-group" x-clipboard>
           <input 
             type="text" 
             value="<%= clashUrl %>" 
@@ -25,17 +22,14 @@
             class="input-field"
           >
           <button @click="copy($clipboard)" class="copy-btn">
-            <i class="fas fa-copy"></i>
+            复制
           </button>
         </div>
       </div>
 
       <div class="card">
-        <div class="card-header">
-          <i class="card-icon bg-purple"></i>
-          <h3 class="card-title">V2Ray 订阅链接</h3>
-        </div>
-        <div x-clipboard class="input-group">
+        <h3 class="text-lg font-semibold mb-4">V2Ray 订阅地址</h3>
+        <div class="input-group" x-clipboard>
           <input 
             type="text" 
             value="<%= v2rayUrl %>" 
@@ -43,19 +37,37 @@
             class="input-field"
           >
           <button @click="copy($clipboard)" class="copy-btn">
-            <i class="fas fa-copy"></i>
+            复制
           </button>
         </div>
       </div>
     </div>
 
-    <div class="usage-guide">
-      <h4>使用方法</h4>
-      <ul>
-        <li>❶ 复制对应客户端订阅链接</li>
-        <li>❷ 在客户端中粘贴并更新</li>
-        <li>❸ 选择节点连接使用</li>
-      </ul>
+    <div class="card mt-8">
+      <h3 class="text-xl font-semibold mb-4">使用指南</h3>
+      <div class="space-y-4">
+        <div class="flex items-start gap-3">
+          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">1</div>
+          <div>
+            <h4 class="font-medium">复制订阅链接</h4>
+            <p class="text-gray-600 text-sm">根据你的客户端类型选择上方对应的订阅链接</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">2</div>
+          <div>
+            <h4 class="font-medium">客户端设置</h4>
+            <p class="text-gray-600 text-sm">在客户端订阅设置中粘贴链接并更新订阅</p>
+          </div>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="bg-blue-100 text-blue-800 rounded-full w-8 h-8 flex items-center justify-center">3</div>
+          <div>
+            <h4 class="font-medium">连接使用</h4>
+            <p class="text-gray-600 text-sm">选择延迟低的节点进行连接即可使用</p>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </body>
