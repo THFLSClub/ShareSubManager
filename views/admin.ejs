@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <a href="/">Home</a>
+    <a href="/logout">Logout</a>
+
+    <h2>Add Subscription</h2>
+    <form method="post" action="/add-subscription">
+        <input type="url" name="url" placeholder="Subscription URL" required>
+        <select name="type">
+            <option value="clash">Clash</option>
+            <option value="v2ray">V2Ray</option>
+        </select>
+        <button type="submit">Add</button>
+    </form>
+
+    <h2>Add Single Node</h2>
+    <form method="post" action="/add-node">
+        <input type="text" name="link" placeholder="vmess://..." required>
+        <button type="submit">Add</button>
+    </form>
+
+    <h2>Current Data</h2>
+    <h3>Subscriptions (<%= subscriptions.length %>)</h3>
+    <ul>
+        <% subscriptions.forEach(sub => { %>
+            <li><%= sub.url %> (<%= sub.type %>)</li>
+        <% }) %>
+    </ul>
+
+    <h3>Nodes (<%= nodes.length %>)</h3>
+    <ul>
+        <% nodes.forEach(node => { %>
+            <li><%= node.name || node.ps %> (<%= node.server %>)</li>
+        <% }) %>
+    </ul>
+</body>
+</html>
