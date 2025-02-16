@@ -1,89 +1,199 @@
-/* 主内容 */
-.container {
-  padding: 2rem 1rem;
-}
+  :root {
+    --primary: #4f46e5;
+    --secondary: #6366f1;
+    --background: #f8fafc;
+  }
 
-/* 卡片样式 */
-.card {
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-}
+  body {
+    background: var(--background);
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1.5rem;
-}
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+  }
 
-.card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 1rem;
-}
+  /* 导航栏 */
+  .navbar {
+    background: white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem 0;
+  }
 
-.bg-blue { background: #3b82f6; }
-.bg-purple { background: #8b5cf6; }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-/* 输入组 */
-.input-group {
-  position: relative;
-}
+  .logo a {
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    font-size: 1.5rem;
+  }
 
-.input-field {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  background: #f8fafc;
-}
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+  }
 
-.copy-btn {
-  position: absolute;
-  right: 0.5rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #64748b;
-}
+  .nav-link {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
 
-.copy-btn:hover {
-  color: #3b82f6;
-}
+  .nav-link:hover {
+    color: var(--primary);
+  }
 
-/* 表格 */
-.node-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+  /* 首页样式 */
+  .hero {
+    text-align: center;
+    padding: 4rem 0;
+  }
 
-.node-table th,
-.node-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #e2e8f0;
-}
+  .hero-title {
+    font-size: 2.5rem;
+    color: #1e293b;
+    margin-bottom: 1rem;
+  }
 
-.node-table th {
-  background: #f8fafc;
-}
+  .hero-subtitle {
+    color: #64748b;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 
-.node-type {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-}
+  .grid-cols-2 {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    margin-top: 2rem;
+  }
 
-.node-type.vmess { background: #ede9fe; color: #6d28d9; }
-.node-type.vless { background: #dbeafe; color: #1d4ed8; }
-.node-type.trojan { background: #fee2e2; color: #dc2626; }
-.node-type.ss { background: #ffedd5; color: #ea580c; }
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .input-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .input-field {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+  }
+
+  .copy-btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .copy-btn:hover {
+    opacity: 0.9;
+  }
+
+  /* 登录页面 */
+  .login-card {
+    max-width: 400px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #475569;
+  }
+
+  .btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    font-weight: 500;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+
+  /* 管理页面 */
+  .node-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .node-table th,
+  .node-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .node-table th {
+    background: #f8fafc;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .node-type {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+
+  .node-type.vmess { background: #e0e7ff; color: #4f46e5; }
+  .node-type.vless { background: #f3e8ff; color: #8b5cf6; }
+  .node-type.trojan { background: #fce7f3; color: #db2777; }
+  .node-type.ss { background: #d1fae5; color: #059669; }
+
+  /* 响应式设计 */
+  @media (max-width: 768px) {
+    .nav-links {
+      display: none;
+    }
+
+    .hero-title {
+      font-size: 2rem;
+    }
+
+    .node-table {
+      display: block;
+      overflow-x: auto;
+    }
+  }
