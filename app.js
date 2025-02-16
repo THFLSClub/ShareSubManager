@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  res.render('login', { error: req.query.error || null })
+  res.render('login')
 })
 
 app.post('/login', async (req, res) => {
@@ -65,7 +65,7 @@ app.post('/login', async (req, res) => {
     req.session.isAdmin = true
     return res.redirect('/admin')
   }
-  res.redirect('/login?error=Invalid credentials')
+  res.render('login', { error: 'Invalid credentials' })
 })
 
 app.get('/logout', (req, res) => {
@@ -83,10 +83,12 @@ app.get('/admin', requireLogin, (req, res) => {
 app.post('/add-subscription', requireLogin, async (req, res) => {
   try {
     const { url, type } = req.body
+    console.log(`尝试添加订阅: URL=${url}, Type=${type}`) // 日志1
     const response = await axios.get(url)
-    const content = response.data
+    console.log('订阅内容获取成功:', response.data.slice(0, 50) + '...') // 日志2（截取部分内容）
     
-    const parsed = await parseSubscription(content, type)
+    const parsed = await parseSubscription(response.data, type)
+    console.log('解析后的节点:', parsed.nodes.length) // 日志3
     
     db.get('subscriptions').push({
       id: crypto.randomUUID(),
@@ -98,6 +100,7 @@ app.post('/add-subscription', requireLogin, async (req, res) => {
     
     res.redirect('/admin')
   } catch (error) {
+    console.error('添加订阅失败:', error.stack) // 完整错误堆栈
     res.status(500).send('Error processing subscription')
   }
 })
@@ -147,14 +150,25 @@ app.get('/subscribe/:type', async (req, res) => {
 
 // 工具函数
 async function parseSubscription(content, type) {
-  if (type === 'clash') {
-    const config = YAML.parse(content)
-    return { nodes: config.proxies }
-  } else if (type === 'v2ray') {
-    const decoded = Buffer.from(content, 'base64').toString()
-    return { nodes: JSON.parse(decoded) }
+  try {
+    if (type === 'clash') {
+      const config = YAML.parse(content)
+      if (!Array.isArray(config.proxies)) {
+        throw new Error('Clash订阅格式错误：缺少proxies数组')
+      }
+      return { nodes: config.proxies }
+    } else if (type === 'v2ray') {
+      const decoded = Buffer.from(content, 'base64').toString('utf8')
+      const nodes = JSON.parse(decoded)
+      if (!Array.isArray(nodes)) {
+        throw new Error('V2Ray订阅格式错误：应为节点数组')
+      }
+      return { nodes }
+    }
+    throw new Error('未知的订阅类型')
+  } catch (error) {
+    throw new Error(`解析失败: ${error.message}`)
   }
-  throw new Error('Unsupported subscription type')
 }
 
 function parseV2rayLink(link) {
