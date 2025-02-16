@@ -1,8 +1,7 @@
-<!DOCTYPE html>
-<html>
-<body>
-  <h1>操作出错</h1>
-  <p style="color: red"><%= message %></p>
-  <a href="/admin">返回管理页</a>
-</body>
-</html>
+<%- include('layout', { title: '发生错误', isAdmin: false }) %>
+
+<article>
+  <h2>操作失败</h2>
+  <p><%= message %></p>
+  <a href="/" role="button">返回首页</a>
+</article>
