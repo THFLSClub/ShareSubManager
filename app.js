@@ -55,7 +55,7 @@ app.get('/', (req, res) => {
 })
 
 app.get('/login', (req, res) => {
-  res.render('login')
+  res.render('login', { error: req.query.error || null })
 })
 
 app.post('/login', async (req, res) => {
@@ -65,7 +65,7 @@ app.post('/login', async (req, res) => {
     req.session.isAdmin = true
     return res.redirect('/admin')
   }
-  res.render('login', { error: 'Invalid credentials' })
+  res.redirect('/login?error=Invalid credentials')
 })
 
 app.get('/logout', (req, res) => {
