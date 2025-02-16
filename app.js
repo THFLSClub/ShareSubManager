@@ -46,8 +46,6 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.use('/public',express.static('public'));
-
 // 数据库初始化
 const db = new sqlite3.Database(config.database);
 db.serialize(() => {
@@ -468,6 +466,8 @@ app.get('/sub/:type(clash|v2ray)', (req, res) => {
       }
   });
 });
+
+app.use('/',express.static('public'));
 
 // 系统维护
 setInterval(() => {
