@@ -235,7 +235,7 @@ function parseSSPlugin(link) {
   return {
     name: params.get('plugin')?.split(';')[0],
     options: Object.fromEntries(
-      params.get('plugin')?.split(';')[1]?.split(',')?.map(p => p.split('=')) || {}
+      params.get('plugin')?.split(';')[1]?.split(',')?.map(p => p.split('=')) || {})
   };
 }
 
