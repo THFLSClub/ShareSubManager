@@ -7,7 +7,7 @@
 
   <main class="container">
     <div class="hero">
-      <h1 class="hero-title">社团节点订阅服务</h1>
+      <h1 class="hero-title">天免费订阅服务</h1>
       <p class="hero-subtitle">每日更新优质免费节点，支持 Clash 和 V2Ray 客户端</p>
     </div>
 
@@ -21,7 +21,7 @@
             readonly
             class="input-field"
           >
-          <button @click="copy($clipboard)" class="copy-btn">
+          <button @click="copy(<%= v2rayUrl %>)" class="copy-btn">
             复制
           </button>
         </div>
@@ -36,7 +36,7 @@
             readonly
             class="input-field"
           >
-          <button @click="copy($clipboard)" class="copy-btn">
+          <button @click="copy(<%= v2rayUrl %>)" class="copy-btn">
             复制
           </button>
         </div>
