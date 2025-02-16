@@ -2,49 +2,48 @@
 <!DOCTYPE html>
 <html lang="zh-CN" x-data="{ activeTab: 'node' }">
 <%- include('partials/head') %>
-<body x-cloak>
+<body>
   <%- include('partials/nav') %>
 
   <main class="container">
-    <div class="admin-header">
-      <h2>节点管理</h2>
-      <div class="node-count">节点总数: <%= nodes.length %></div>
-    </div>
-
-    <div class="card">
-      <h3>添加新节点</h3>
-      <form method="post" action="/add" class="form">
-        <div class="tab-control">
+    <div class="card mb-6">
+      <h2 class="text-xl font-semibold mb-4">添加节点</h2>
+      <form method="post" action="/add" class="space-y-4">
+        <div class="flex gap-2">
           <button 
             type="button"
             @click="activeTab = 'node'"
-            :class="activeTab === 'node' ? 'active' : ''"
-          >单个节点</button>
+            class="px-4 py-2 rounded-lg"
+            :class="activeTab === 'node' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'"
+          >
+            单个节点
+          </button>
           <button 
             type="button"
             @click="activeTab = 'sub'"
-            :class="activeTab === 'sub' ? 'active' : ''"
-          >订阅链接</button>
+            class="px-4 py-2 rounded-lg"
+            :class="activeTab === 'sub' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100'"
+          >
+            订阅链接
+          </button>
         </div>
 
         <div x-show="activeTab === 'node'">
-          <label>节点链接</label>
           <textarea
             name="content"
             rows="4"
-            class="input-field"
-            placeholder="ss://、vmess:// 等格式..."
+            class="input-field w-full"
+            placeholder="请输入节点链接（ss://、vmess:// 等格式）"
           ></textarea>
           <input type="hidden" name="type" value="node">
         </div>
 
         <div x-show="activeTab === 'sub'">
-          <label>订阅链接</label>
           <input
             type="url"
             name="content"
-            class="input-field"
-            placeholder="https://example.com/sub"
+            class="input-field w-full"
+            placeholder="请输入订阅链接地址"
           >
           <input type="hidden" name="type" value="subscription">
         </div>
@@ -53,43 +52,40 @@
       </form>
     </div>
 
-    <div class="table-container">
-      <table class="node-table">
-        <thead>
-          <tr>
-            <th>类型</th>
-            <th>节点配置</th>
-            <th>创建时间</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% nodes.forEach(node => { 
-            const cfg = JSON.parse(node.config) %>
+    <div class="card">
+      <h2 class="text-xl font-semibold mb-4">节点列表（共 <%= nodes.length %> 个）</h2>
+      <div class="overflow-x-auto">
+        <table class="node-table">
+          <thead>
             <tr>
-              <td>
-                <span class="node-type <%= node.type %>">
-                  <%= node.type.toUpperCase() %>
-                </span>
-              </td>
-              <td>
-                <div class="node-info">
-                  <div class="node-name"><%= cfg.ps %></div>
-                  <div class="node-address"><%= cfg.add %>:<%= cfg.port %></div>
-                </div>
-              </td>
-              <td>
-                <%= new Date(node.created_at).toLocaleDateString() %>
-              </td>
-              <td>
-                <button class="delete-btn">
-                  <i class="fas fa-trash"></i>
-                </button>
-              </td>
+              <th>类型</th>
+              <th>节点信息</th>
+              <th>添加时间</th>
             </tr>
-          <% }) %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% nodes.forEach(node => { 
+              const cfg = JSON.parse(node.config) %>
+              <tr>
+                <td>
+                  <span class="node-type <%= node.type %>">
+                    <%= node.type.toUpperCase() %>
+                  </span>
+                </td>
+                <td>
+                  <div class="node-info">
+                    <div class="font-medium"><%= cfg.ps %></div>
+                    <div class="text-sm text-gray-500"><%= cfg.add %>:<%= cfg.port %></div>
+                  </div>
+                </td>
+                <td>
+                  <%= new Date(node.created_at).toLocaleDateString() %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </main>
 </body>
