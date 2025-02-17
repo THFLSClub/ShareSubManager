@@ -11,6 +11,8 @@ const YAML = require('yaml');
 const URL = require('url');
 const path = require('path');
 const fs = require('fs');
+const net = require('net');
+const pLimit = require('p-limit');
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -25,7 +27,13 @@ const config = {
   baseUrl: process.env.BASE_URL || 'http://localhost:3000',
   secret: process.env.SECRET || uuidv4(),
   nodeTypes: ['vmess', 'vless', 'trojan', 'ss'],
-  maxNodes: 500
+  maxNodes: 500,
+  healthCheck: {
+    interval: 6 * 60 * 60 * 1000,    // 6小时
+    timeout: 5000,                   // 5秒超时
+    maxFails: 3,                     // 最大失败次数
+    concurrency: 20                  // 并发检测数
+  }
 };
 
 // 中间件配置
@@ -46,22 +54,33 @@ app.use(session({
 }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
 // 数据库初始化
 const db = new sqlite3.Database(config.database);
 db.serialize(() => {
+  // 创建节点表（包含健康监测字段）
   db.run(`CREATE TABLE IF NOT EXISTS nodes (
     id TEXT PRIMARY KEY,
     type TEXT CHECK(type IN ('vmess', 'vless', 'trojan', 'ss')),
     config TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    last_check DATETIME,
+    latency INTEGER,
+    fail_count INTEGER DEFAULT 0
   )`);
 
+  // 创建订阅表
   db.run(`CREATE TABLE IF NOT EXISTS subscriptions (
     id TEXT PRIMARY KEY,
     url TEXT UNIQUE,
     type TEXT CHECK(type IN ('v2ray', 'clash')),
     last_updated DATETIME
   )`);
+
+  // 兼容旧表结构
+  ['last_check', 'latency', 'fail_count'].forEach(col => {
+    db.run(`ALTER TABLE nodes ADD COLUMN ${col}`, () => {}); // 忽略错误
+  });
 });
 
 // 增强协议解析器
@@ -498,13 +517,75 @@ app.get('/sub/:type(clash|v2ray)', (req, res) => {
 
 app.use('/statics',express.static('public'));
 
+async function testNodeConnectivity(node) {
+  return new Promise((resolve) => {
+    const cfg = JSON.parse(node.config);
+    const socket = net.createConnection({
+      host: cfg.add,
+      port: cfg.port,
+      timeout: config.healthCheck.timeout
+    });
+
+    const startTime = Date.now();
+    
+    socket.on('connect', () => {
+      socket.destroy();
+      resolve({
+        success: true,
+        latency: Date.now() - startTime
+      });
+    });
+
+    socket.on('timeout', () => {
+      socket.destroy();
+      resolve({ success: false, error: 'Connection timeout' });
+    });
+
+    socket.on('error', (err) => {
+      resolve({ success: false, error: err.message });
+    });
+  });
+}
+
+async function performHealthCheck() {
+  const nodes = await new Promise((resolve) => {
+    db.all('SELECT * FROM nodes', [], (err, rows) => resolve(rows));
+  });
+
+  const limit = pLimit(config.healthCheck.concurrency);
+  const checks = nodes.map(node => limit(async () => {
+    const result = await testNodeConnectivity(node);
+    
+    if (result.success) {
+      db.run('UPDATE nodes SET last_check = ?, latency = ?, fail_count = 0 WHERE id = ?',
+        [new Date().toISOString(), result.latency, node.id]);
+    } else {
+      db.run('UPDATE nodes SET last_check = ?, fail_count = fail_count + 1 WHERE id = ?',
+        [new Date().toISOString(), node.id]);
+    }
+  }));
+
+  await Promise.all(checks);
+}
+
 // 系统维护
-setInterval(() => {
-  db.run(`DELETE FROM nodes WHERE rowid NOT IN 
-    (SELECT rowid FROM nodes ORDER BY created_at DESC LIMIT ?)`, 
-    [config.maxNodes]);
-}, 3600000);
+setInterval(async () => {
+  console.log('正在执行节点健康检查...');
+  try {
+    await performHealthCheck();
+    db.run(`DELETE FROM nodes WHERE fail_count > ?`, 
+      [config.healthCheck.maxFails], 
+      (err) => {
+        if (err) console.error('节点清理失败:', err);
+        else console.log(`已清理连续${config.healthCheck.maxFails}次检测失败的节点`);
+      }
+    );
+  } catch (e) {
+    console.error('健康检查出错:', e);
+  }
+}, config.healthCheck.interval);
 
 app.listen(port, () => {
   console.log(`服务已启动: ${config.baseUrl}`);
+  console.log(`健康检查间隔: ${config.healthCheck.interval/60000}分钟`);
 });
