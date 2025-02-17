@@ -12,7 +12,7 @@ const URL = require('url');
 const path = require('path');
 const fs = require('fs');
 const net = require('net');
-const pLimit = require('p-limit');
+import pLimit from 'p-limit';
 const app = express();
 const port = process.env.PORT || 3000;
 
